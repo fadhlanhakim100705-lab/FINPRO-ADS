@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIM-B – Sistem Informasi Manajemen Bimasakti</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,sans-serif;background:#e8e3d5;color:#1a1a2e}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+.hidden{display:none!important}
+:root{
+  --gd:#1B5E20;--gm:#2E7D32;--gl:#4CAF50;
+  --cream:#f8f5eb;--cream2:#e8e3d5;--sidebar:#f5f0e3;
+  --white:#fff;--border:#d0c9bc;
+  --red:#C62828;--redbg:#FFEBEE;
+  --yellow:#F57F17;--ybg:#FFFDE7;
+  --blue:#1565C0;--bbg:#E3F2FD;
+  --green2bg:#E8F5E9;--shadow:0 2px 8px rgba(0,0,0,.08);--r:10px
+}
+
+/* ── LOGIN ── */
+#loginPage{min-height:100vh;background:var(--cream2);display:flex;flex-direction:column}
+.lh{background:var(--cream);padding:18px 30px;border-bottom:1px solid var(--border);text-align:center}
+.lh h1{font-family:Georgia,serif;font-size:24px;font-weight:700}
+.lb{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.lcard{background:var(--white);border-radius:16px;padding:40px 45px;width:420px;border:1px solid #bbb;box-shadow:var(--shadow)}
+.logo-area{text-align:center;margin-bottom:28px}
+.logo-text{font-family:Georgia,serif;font-size:28px;color:var(--gd);font-weight:700}
+.logo-sub{font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase}
+.form-lbl{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:#444}
+.inp-wrap{position:relative;margin-bottom:4px}
+.finp{width:100%;padding:11px 40px 11px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;transition:border .15s}
+.finp:focus{border-color:var(--gd)}
+.finp.err{border-color:var(--red)}
+.inp-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:17px;color:#888}
+.errtxt{color:var(--red);font-size:12px;min-height:16px;margin-bottom:4px}
+.forgot{font-size:12px;color:#888;text-decoration:none}
+.forgot:hover{color:var(--gd)}
+.btn-login{width:100%;padding:13px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;letter-spacing:1px;margin-top:10px;transition:background .15s}
+.btn-login:hover{background:var(--gm)}
+
+/* ── APP LAYOUT ── */
+#appLayout{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:240px;min-width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:15px 18px;border-bottom:1px solid var(--border)}
+.sb-nav{padding:10px 0;flex:1}
+.nav-it{display:flex;align-items:center;gap:11px;padding:10px 18px;cursor:pointer;color:#5a5a7a;font-size:13.5px;font-weight:500;border-right:3px solid transparent;transition:all .15s}
+.nav-it:hover{background:#ede8da;color:var(--gd)}
+.nav-it.active{color:var(--gd);font-weight:700;border-right-color:var(--gd);background:#ede8da}
+.nav-it.red-nav{color:#e53935}
+.nav-it.red-nav:hover{background:#ffeaea;color:#c62828}
+.nav-sep{height:1px;background:var(--border);margin:6px 0}
+.nav-sub{padding-left:44px;font-size:12.5px}
+.nav-ico{font-size:16px;min-width:18px;text-align:center}
+
+/* ── TOPBAR ── */
+.app-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--sidebar);padding:11px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0}
+.tb-title{font-family:Georgia,serif;font-size:20px;font-weight:700;white-space:nowrap}
+.srch{display:flex;align-items:center;background:#fff;border:1px solid #ccc;border-radius:20px;padding:6px 15px;gap:7px;flex:1;max-width:310px}
+.srch input{border:none;outline:none;font-size:13px;width:100%;background:transparent}
+.prof{display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .15s}
+.prof:hover{background:#ede8da}
+.prof-txt{text-align:right}
+.prof-name{font-size:13px;font-weight:700}
+.prof-role{font-size:11px;color:#888}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden}
+.av-admin{background:#1565C0;color:#fff}
+.av-akuntan{background:#37474F;color:#fff}
+.av-owner{background:#4E342E;color:#fff}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:22px 26px;background:var(--cream2)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto}
+.dtbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+.dtbl th{padding:12px 13px;text-align:center;font-weight:700;border:1px solid #5a9e6f;color:#333;background:#fff}
+.dtbl td{padding:11px 13px;text-align:center;border:1px solid #c8e6c9;color:#333}
+.dtbl tr:hover td{background:#f0f8f0}
+.tbl-box{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #5a9e6f}
+.tbl-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:8px}
+.pgn{display:flex;gap:4px;align-items:center}
+.pgb{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:#fff;transition:all .15s;white-space:nowrap;padding:0 8px}
+.pgb.act{background:var(--gd);color:#fff;border-color:var(--gd)}
+.pgb:hover:not(.act){background:#f0f0f0}
+.pgb:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 20px;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--gd);color:#fff}.btn-p:hover{background:var(--gm)}
+.btn-d{background:var(--red);color:#fff}.btn-d:hover{background:#b71c1c}
+.btn-o{background:#fff;border:2px solid var(--gd);color:var(--gd)}.btn-o:hover{background:var(--green2bg)}
+.btn-s{background:#f0f0f0;color:#333;border:1px solid #ddd}.btn-s:hover{background:#e0e0e0}
+.abt{display:flex;align-items:center;gap:7px;padding:9px 16px;border:2px solid #ddd;border-radius:9px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.abt:hover{border-color:var(--gd);color:var(--gd)}
+.abt-p{background:var(--gd);color:#fff;border-color:var(--gd)}.abt-p:hover{background:var(--gm)}
+
+/* ── CARDS & STATS ── */
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.db-title{font-size:19px;font-weight:800;border:2px solid var(--gd);border-radius:10px;padding:9px 20px;background:#fff}
+.db-sub{font-size:12.5px;color:#777;margin:4px 0 14px}
+.pa-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.badge{padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block}
+.b-aktif{background:#E8F5E9;color:#2E7D32}
+.b-inden{background:#FFF9C4;color:#F57F17}
+.b-nonaktif,.b-keluar{background:#FFEBEE;color:#C62828}
+.b-lunas{background:#E8F5E9;color:#2E7D32}
+.b-belum{background:#FFF3E0;color:#E65100}
+.b-tunggak{background:#FFEBEE;color:#C62828}
+.b-penuh{background:#FFEBEE;color:#C62828}
+
+/* ── FORMS ── */
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:#444}
+.fc{width:100%;padding:10px 13px;border:1px solid #ddd;border-radius:8px;font-size:13.5px;outline:none;background:#fff;transition:border .15s}
+.fc:focus{border-color:var(--gd)}
+.fc.ferr{border-color:var(--red)}
+.ferrtxt{color:var(--red);font-size:11.5px;margin-top:3px}
+textarea.fc{resize:vertical;min-height:110px}
+select.fc{cursor:pointer}
+
+/* ── MODAL ── */
+.m-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999}
+.mbox{background:#fff;border-radius:16px;padding:30px;max-width:480px;width:92%;text-align:center}
+.mgreen{background:var(--gd);color:#fff;border-radius:16px;padding:30px;max-width:520px;width:92%}
+.m-ico{font-size:48px;margin-bottom:14px}
+.m-ttl{font-size:19px;font-weight:700;margin-bottom:8px}
+.m-sub{font-size:13px;opacity:.88;margin-bottom:16px}
+.m-acts{display:flex;gap:12px;justify-content:center;margin-top:18px}
+.m-row{display:flex;justify-content:space-between;background:rgba(255,255,255,.13);border-radius:7px;padding:7px 13px;margin:5px 0;font-size:13.5px}
+.m-k{opacity:.8}.m-v{font-weight:700}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:18px;right:18px;color:#fff;padding:13px 22px;border-radius:9px;font-weight:700;font-size:13.5px;z-index:99999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:tIn .3s ease}
+@keyframes tIn{from{transform:translateY(-18px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap{position:relative}
+.ac-dd{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:200;max-height:200px;overflow-y:auto}
+.ac-it{padding:9px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0}
+.ac-it:hover{background:#f0f8f0}
+.ac-it:last-child{border-bottom:none}
+
+/* ── ADMIN DASHBOARD ── */
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.stat-bl{background:#fff;border-radius:12px;padding:18px;text-align:center;box-shadow:var(--shadow)}
+.st-lbl{font-size:13px;font-weight:600;color:#666;margin-bottom:8px}
+.st-val{font-size:40px;font-weight:800;background:#FFD600;border-radius:7px;padding:4px 10px;display:inline-block;min-width:80px}
+.qnav{display:flex;gap:11px;flex-wrap:wrap}
+.qb{display:flex;align-items:center;gap:9px;padding:12px 20px;border-radius:9px;border:2px solid #ddd;background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.qb:hover,.qb.act{background:var(--gd);color:#fff;border-color:var(--gd)}
+.qb-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+/* ── SMART INPUT ── */
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.si-panel{background:#fff;border-radius:12px;padding:20px}
+.si-ttl{font-size:15px;font-weight:700;margin-bottom:13px}
+.pnum{display:inline-flex;width:21px;height:21px;background:var(--gd);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:5px}
+.prev-id{font-size:14px;font-weight:700;padding:8px 12px;background:#E8F5E9;border-radius:6px;color:var(--gd);margin-bottom:10px}
+.prev-row{display:grid;grid-template-columns:130px 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.prev-lbl{font-size:12px;color:#888}
+.prev-val{font-size:13.5px;font-weight:500;padding:7px 11px;background:#f5f5f5;border-radius:6px;min-height:32px;color:#333}
+.wa-hint{font-family:monospace;font-size:11px;color:#999;background:#f9f9f9;padding:8px;border-radius:6px;margin-bottom:9px;line-height:1.7}
+
+/* ── PLOTTING ── */
+.plt-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.plt-panel{background:#fff;border-radius:12px;padding:20px}
+.plt-ttl{font-size:14px;font-weight:800;text-align:center;border:2px solid #ddd;border-radius:9px;padding:10px;margin-bottom:16px;display:flex;align-items:center;gap:7px;justify-content:center}
+
+/* ── MASTER SISWA ── */
+.ms-grid{display:grid;grid-template-columns:1fr 220px;gap:16px;align-items:start}
+.ring-panel{background:#fff;border-radius:12px;padding:15px}
+.ri-item{border-radius:9px;padding:11px 14px;margin-bottom:8px}
+.ri-lbl{font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.ri-val{font-size:27px;font-weight:800}
+.ri-g{background:#E8F5E9;color:#2E7D32}
+.ri-y{background:#FFF9C4;color:#F57F17}
+.ri-r{background:#FFEBEE;color:#C62828}
+
+/* ── AKUNTAN SPP ── */
+.spp-grid{display:grid;grid-template-columns:1fr 255px;gap:16px;align-items:start}
+.sum-item{border-radius:9px;padding:12px 14px;margin-bottom:8px}
+.si-lbl{font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.si-val{font-size:28px;font-weight:800}
+.si-blue{background:var(--bbg);color:var(--blue)}
+.si-green{background:var(--green2bg);color:var(--gm)}
+.si-yel{background:var(--ybg);color:var(--yellow)}
+.si-red{background:var(--redbg);color:var(--red)}
+
+/* ── CATAT PEMBAYARAN ── */
+.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.st-tog{display:flex;gap:9px}
+.stb{flex:1;padding:10px;border-radius:7px;border:2px solid transparent;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.stb-l{background:#E8F5E9;color:#2E7D32}.stb-l.sel{background:#2E7D32;color:#fff;border-color:#1B5E20}
+.stb-t{background:#FFEBEE;color:#C62828}.stb-t.sel{background:#C62828;color:#fff;border-color:#B71C1C}
+.prv-tr{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:9px;padding:14px;margin-bottom:14px}
+.prv-row{display:flex;gap:24px}
+.prv-col .pc-l{font-size:11px;color:#888;font-weight:600}
+.prv-col .pc-v{font-size:13px;font-weight:600;margin-top:2px}
+
+/* ── OWNER LAPORAN ── */
+.lap-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+.ls-card{background:#fff;border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.ls-lbl{font-size:12.5px;font-weight:600;color:#555;margin-bottom:7px}
+.ls-val{font-size:33px;font-weight:800}
+.ls-sub{font-size:11px;color:#888;margin-top:4px}
+.ls-g{color:var(--gm)}.ls-r{color:var(--red)}.ls-b{color:var(--blue)}.ls-o{color:#E65100}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ch-card{background:#fff;border-radius:12px;padding:18px}
+.ch-ttl{font-size:13.5px;font-weight:700;text-align:center;margin-bottom:12px}
+
+/* ── PENGATURAN ── */
+.stg-card{background:#fff;border-radius:12px;padding:24px}
+.stg-inner{display:flex;align-items:flex-start;gap:26px;margin-top:16px;border:1px solid #eee;border-radius:10px;padding:22px;position:relative}
+.stg-av{width:90px;height:90px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0}
+.stg-flds{display:flex;flex-direction:column;gap:9px}
+.stg-fld{padding:9px 17px;border:1px solid #ddd;border-radius:20px;font-size:13.5px;min-width:210px;color:#444}
+.stg-sta{background:var(--gd);color:#fff;font-weight:700;padding:7px 18px;border-radius:20px;font-size:13.5px;position:absolute;right:22px;top:22px}
+
+/* ── KELUAR ── */
+.kel-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:28px}
+.kel-ttl{font-size:34px;font-weight:800;color:#1a237e;text-align:center}
+.kel-btns{display:flex;gap:18px}
+.kel-ya{background:var(--red);color:#fff;padding:14px 50px;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.kel-ya:hover{background:#b71c1c}
+.kel-tdk{background:var(--gd);color:#fff;padding:14px 50px;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.kel-tdk:hover{background:var(--gm)}
+
+/* ── ID LINK ── */
+.idlnk{color:var(--gd);font-weight:700;cursor:pointer;text-decoration:underline}
+.idlnk:hover{color:var(--gm)}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.fsel{padding:9px 13px;border:2px solid #ddd;border-radius:8px;font-size:13px;font-weight:600;background:#fff;cursor:pointer;outline:none}
+.fsel:focus{border-color:var(--gd)}
+.fbtn{padding:9px 17px;border:2px solid #ddd;border-radius:8px;font-size:13px;font-weight:700;background:#fff;cursor:pointer;white-space:nowrap}
+.fbtn:hover{background:var(--gd);color:#fff;border-color:var(--gd)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .si-grid,.plt-grid,.cf-grid,.charts-row{grid-template-columns:1fr}
+  .ms-grid,.spp-grid{grid-template-columns:1fr}
+  .lap-stats{grid-template-columns:repeat(2,1fr)}
+  .dash-stats{grid-template-columns:1fr 1fr}
+}
+
+/* ── DAFTAR KELAS (per-class student list) ── */
+.kls-info{font-size:13px;color:#555;background:#f9f9f9;padding:9px 14px;border-radius:7px;margin-bottom:12px}
+
+/* kelas selector dropdown styled */
+.kls-sel-wrap{display:flex;align-items:center;gap:7px;background:#fff;border:2px solid #ddd;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700}
+.kls-sel-wrap select{border:none;outline:none;font-size:13px;font-weight:700;cursor:pointer;background:transparent}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div id="loginPage">
+  <div class="lh"><h1>Sistem Informasi Manajemen Terpadu Bimasakti (SIM-B)</h1></div>
+  <div class="lb">
+    <div class="lcard">
+      <div class="logo-area">
+        <svg width="70" height="70" viewBox="0 0 70 70" style="display:block;margin:0 auto 6px">
+          <circle cx="35" cy="35" r="31" fill="none" stroke="#1B5E20" stroke-width="2"/>
+          <circle cx="35" cy="35" r="22" fill="none" stroke="#2E7D32" stroke-width="1.2"/>
+          <circle cx="35" cy="35" r="4" fill="#1B5E20"/>
+          <g id="spokes"></g>
+        </svg>
+        <div class="logo-sub">bimbel</div>
+        <div class="logo-text">Bimasakti</div>
+      </div>
+      <div class="fg">
+        <label class="form-lbl">Username</label>
+        <div class="inp-wrap">
+          <input class="finp" id="lUser" type="text" placeholder="Username" onkeydown="if(event.key==='Enter')doLogin()">
+          <span class="inp-icon">👤</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="form-lbl">Password</label>
+        <div class="inp-wrap">
+          <input class="finp" id="lPass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+          <span class="inp-icon">🔒</span>
+        </div>
+      </div>
+      <div id="lErr" class="errtxt"></div>
+      <div style="text-align:right;margin-bottom:4px"><a class="forgot" href="#">Forgot Password?</a></div>
+      <button class="btn-login" onclick="doLogin()">LOGIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP LAYOUT ═══════════════ -->
+<div id="appLayout" class="hidden">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="app-main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- Modal Overlay -->
+<div id="mOv" class="m-ov hidden" onclick="closeMod(event)"></div>
+<!-- Toast -->
+<div id="toast" class="toast hidden"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA & CONSTANTS
+══════════════════════════════════════════ */
+const USERS = [
+  {username:'admin',    password:'admin123',    role:'admin',   name:'Kelompok E', title:'Admin Pusat', email:'admin@bimasakti.com'},
+  {username:'akuntan',  password:'akuntan123',  role:'akuntan', name:'Kelompok E', title:'Akuntan',     email:'akuntan@bimasakti.com'},
+  {username:'owner',    password:'owner123',    role:'owner',   name:'Kelompok E', title:'Owner',       email:'owner@bimasakti.com'}
+];
+
+const DEF_STU = [
+  {id:'BIM-24-000001',namaLengkap:'Arsyila Romeesa Farzana',namaPanggilan:'Syila',tglLahir:'12-02-2018',tingkatKelas:'SD 1',sekolah:"MI Ma'arif Candran",noHpOrtu:'081234567801',noHpSiswa:'082345678901',alamat:'Bantulan, Sidoarum, Godean',sumberInfo:'Teman',tglMendaftar:'10-01-2024',status:'Aktif',createdAt:'10-01-2024 08:00'},
+  {id:'BIM-24-000002',namaLengkap:'Andi Wijaya',namaPanggilan:'Andi',tglLahir:'30-09-2007',tingkatKelas:'SMA 11',sekolah:'SMAN 1 Godean',noHpOrtu:'081234567802',noHpSiswa:'082345678902',alamat:'Wirokraman, Sidoarum',sumberInfo:'Instagram',tglMendaftar:'02-01-2024',status:'Non-Aktif',createdAt:'02-01-2024 08:30'},
+  {id:'BIM-24-000003',namaLengkap:'Aqilatunisa Hanindya Ramadhani',namaPanggilan:'Aqilatun',tglLahir:'09-05-2020',tingkatKelas:'TK B',sekolah:'TK Tunas Melati',noHpOrtu:'081234567803',noHpSiswa:'082345678903',alamat:'Bantulan',sumberInfo:'Brosur',tglMendaftar:'01-02-2024',status:'Aktif',createdAt:'01-02-2024 10:00'},
+  {id:'BIM-24-000004',namaLengkap:'Budi Santoso',namaPanggilan:'Budi',tglLahir:'15-03-2015',tingkatKelas:'SD 3',sekolah:'SD Negeri Godean',noHpOrtu:'081234567804',noHpSiswa:'082345678904',alamat:'Godean',sumberInfo:'Teman',tglMendaftar:'20-01-2024',status:'Aktif',createdAt:'20-01-2024 09:00'},
+  {id:'BIM-24-000005',namaLengkap:'Ryobi Revan Pratama',namaPanggilan:'Ryobi',tglLahir:'10-06-2016',tingkatKelas:'SD 2',sekolah:'SD Negeri Sidoarum',noHpOrtu:'081234567805',noHpSiswa:'082345678905',alamat:'Sidoarum, Godean',sumberInfo:'Brosur',tglMendaftar:'15-02-2024',status:'Aktif',createdAt:'15-02-2024 11:00'},
+  {id:'BIM-24-000006',namaLengkap:'Dewi Rahayu',namaPanggilan:'Dewi',tglLahir:'22-07-2008',tingkatKelas:'SMP 8',sekolah:'SMPN 2 Godean',noHpOrtu:'081234567806',noHpSiswa:'082345678906',alamat:'Godean',sumberInfo:'Instagram',tglMendaftar:'05-03-2024',status:'Aktif',createdAt:'05-03-2024 14:00'},
+  {id:'BIM-24-000007',namaLengkap:'Rizky Pratama',namaPanggilan:'Rizky',tglLahir:'18-11-2009',tingkatKelas:'SMP 9',sekolah:'SMPN 1 Godean',noHpOrtu:'081234567807',noHpSiswa:'082345678907',alamat:'Godean',sumberInfo:'Teman',tglMendaftar:'10-03-2024',status:'Aktif',createdAt:'10-03-2024 10:00'},
+  {id:'BIM-24-000008',namaLengkap:'Siti Aisyah',namaPanggilan:'Siti',tglLahir:'03-04-2019',tingkatKelas:'TK A',sekolah:'TK Dharma Wanita',noHpOrtu:'081234567808',noHpSiswa:'082345678908',alamat:'Godean',sumberInfo:'Tetangga',tglMendaftar:'15-03-2024',status:'Inden',createdAt:'15-03-2024 09:00'},
+  {id:'BIM-24-000009',namaLengkap:'Ahmad Fauzi',namaPanggilan:'Ahmad',tglLahir:'25-08-2010',tingkatKelas:'SD 6',sekolah:'SD Negeri Godean',noHpOrtu:'081234567809',noHpSiswa:'082345678909',alamat:'Sidoarum',sumberInfo:'Instagram',tglMendaftar:'20-03-2024',status:'Inden',createdAt:'20-03-2024 13:00'},
+  {id:'BIM-24-000010',namaLengkap:'Putri Ayu Lestari',namaPanggilan:'Putri',tglLahir:'12-09-2006',tingkatKelas:'SMA 10',sekolah:'SMAN 1 Godean',noHpOrtu:'081234567810',noHpSiswa:'082345678910',alamat:'Godean',sumberInfo:'Brosur',tglMendaftar:'01-04-2024',status:'Keluar',createdAt:'01-04-2024 08:00'},
+  {id:'BIM-24-000011',namaLengkap:'Muhammad Farel',namaPanggilan:'Farel',tglLahir:'07-12-2013',tingkatKelas:'SD 4',sekolah:'MI Islamiyah Godean',noHpOrtu:'081234567811',noHpSiswa:'082345678911',alamat:'Godean',sumberInfo:'Teman',tglMendaftar:'01-05-2024',status:'Aktif',createdAt:'01-05-2024 08:00'},
+  {id:'BIM-24-000012',namaLengkap:'Naila Zahra',namaPanggilan:'Naila',tglLahir:'14-06-2012',tingkatKelas:'SD 5',sekolah:'SD Negeri Godean 2',noHpOrtu:'081234567812',noHpSiswa:'082345678912',alamat:'Godean',sumberInfo:'Brosur',tglMendaftar:'10-05-2024',status:'Aktif',createdAt:'10-05-2024 09:30'},
+];
+
+const DEF_KELAS = [
+  {id:'KLS-001',namaKelas:'Calistung A',program:'Calistung',cabang:'Godean',kuotaTersedia:8,kuotaTerisi:2,status:'Aktif'},
+  {id:'KLS-002',namaKelas:'1A',program:'SD',cabang:'Godean',kuotaTersedia:8,kuotaTerisi:3,status:'Aktif'},
+  {id:'KLS-003',namaKelas:'1B',program:'SD',cabang:'Godean',kuotaTersedia:8,kuotaTerisi:8,status:'Penuh'},
+  {id:'KLS-004',namaKelas:'9B',program:'SMP',cabang:'Sidoarum',kuotaTersedia:8,kuotaTerisi:5,status:'Aktif'},
+  {id:'KLS-005',namaKelas:'11A',program:'SMA',cabang:'Godean',kuotaTersedia:6,kuotaTerisi:3,status:'Aktif'},
+  {id:'KLS-006',namaKelas:'M_13A',program:'Matematika',cabang:'Sidoarum',kuotaTersedia:6,kuotaTerisi:2,status:'Aktif'},
+  {id:'KLS-007',namaKelas:'TK A',program:'TK',cabang:'Godean',kuotaTersedia:6,kuotaTerisi:1,status:'Aktif'},
+  {id:'KLS-008',namaKelas:'SD 4A',program:'SD',cabang:'Sidoarum',kuotaTersedia:8,kuotaTerisi:4,status:'Aktif'},
+];
+
+const DEF_JDW = [
+  {id:'JDW-001',idKelas:'KLS-001',hari:'Selasa',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-002',idKelas:'KLS-001',hari:'Jumat',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-003',idKelas:'KLS-002',hari:'Rabu',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-004',idKelas:'KLS-002',hari:'Sabtu',sesi:'Sesi 1',jamMulai:'13:30',jamSelesai:'14:50'},
+  {id:'JDW-005',idKelas:'KLS-003',hari:'Selasa',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-006',idKelas:'KLS-004',hari:'Senin',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-007',idKelas:'KLS-005',hari:'Rabu',sesi:'Sesi 2',jamMulai:'17:00',jamSelesai:'18:20'},
+  {id:'JDW-008',idKelas:'KLS-006',hari:'Kamis',sesi:'Sesi 1',jamMulai:'15:30',jamSelesai:'16:50'},
+  {id:'JDW-009',idKelas:'KLS-007',hari:'Senin',sesi:'Sesi 1',jamMulai:'09:00',jamSelesai:'10:20'},
+  {id:'JDW-010',idKelas:'KLS-008',hari:'Selasa',sesi:'Sesi 2',jamMulai:'16:00',jamSelesai:'17:20'},
+];
+
+const DEF_PLT = [
+  {id:'PLT-001',idSiswa:'BIM-24-000001',namaLengkap:'Arsyila Romeesa Farzana',idKelas:'KLS-002',tglMulai:'20-01-2024',tglSelesai:'',tutor:'Mr. BAGUS'},
+  {id:'PLT-002',idSiswa:'BIM-24-000002',namaLengkap:'Andi Wijaya',idKelas:'KLS-005',tglMulai:'02-01-2024',tglSelesai:'08-01-2024',tutor:'Ms. SARI'},
+  {id:'PLT-003',idSiswa:'BIM-24-000003',namaLengkap:'Aqilatunisa Hanindya Ramadhani',idKelas:'KLS-001',tglMulai:'15-02-2024',tglSelesai:'',tutor:'Ms. DEWI'},
+  {id:'PLT-004',idSiswa:'BIM-24-000004',namaLengkap:'Budi Santoso',idKelas:'KLS-002',tglMulai:'20-01-2024',tglSelesai:'',tutor:'Mr. BAGUS'},
+  {id:'PLT-005',idSiswa:'BIM-24-000005',namaLengkap:'Ryobi Revan Pratama',idKelas:'KLS-002',tglMulai:'15-02-2024',tglSelesai:'',tutor:'Mr. BAGUS'},
+  {id:'PLT-006',idSiswa:'BIM-24-000006',namaLengkap:'Dewi Rahayu',idKelas:'KLS-004',tglMulai:'05-03-2024',tglSelesai:'',tutor:'Mr. ANDI'},
+  {id:'PLT-007',idSiswa:'BIM-24-000007',namaLengkap:'Rizky Pratama',idKelas:'KLS-004',tglMulai:'10-03-2024',tglSelesai:'',tutor:'Mr. ANDI'},
+];
+
+const DEF_TRX = [
+  {id:'SPP-0001',idSiswa:'BIM-24-000001',tglBayar:'2026-05-04',nominal:160000,metodeBayar:'Transfer Bank',kategoriSPP:'Reguler-Bulanan',periode:'Mei 2026',statusSPP:'Lunas',keterangan:''},
+  {id:'SPP-0002',idSiswa:'BIM-24-000002',tglBayar:'2026-05-05',nominal:160000,metodeBayar:'Tunai',kategoriSPP:'Reguler-Bulanan',periode:'Mei 2026',statusSPP:'Lunas',keterangan:''},
+  {id:'SPP-0003',idSiswa:'BIM-24-000005',tglBayar:'2026-05-04',nominal:160000,metodeBayar:'',kategoriSPP:'Reguler-Bulanan',periode:'Mei 2026',statusSPP:'Belum Bayar',keterangan:''},
+  {id:'SPP-0004',idSiswa:'BIM-24-000003',tglBayar:'2026-04-15',nominal:160000,metodeBayar:'QRIS',kategoriSPP:'Reguler-Bulanan',periode:'April 2026',statusSPP:'Lunas',keterangan:''},
+  {id:'SPP-0005',idSiswa:'BIM-24-000004',tglBayar:'2026-04-20',nominal:160000,metodeBayar:'Transfer Bank',kategoriSPP:'Reguler-Bulanan',periode:'April 2026',statusSPP:'Lunas',keterangan:''},
+  {id:'SPP-0006',idSiswa:'BIM-24-000006',tglBayar:'2026-04-10',nominal:160000,metodeBayar:'Tunai',kategoriSPP:'Reguler-Bulanan',periode:'April 2026',statusSPP:'Lunas',keterangan:''},
+  {id:'SPP-0007',idSiswa:'BIM-24-000007',tglBayar:'',nominal:160000,metodeBayar:'',kategoriSPP:'Reguler-Bulanan',periode:'Mei 2026',statusSPP:'Tunggakan',keterangan:''},
+  {id:'SPP-0008',idSiswa:'BIM-24-000011',tglBayar:'2026-05-02',nominal:160000,metodeBayar:'QRIS',kategoriSPP:'Reguler-Bulanan',periode:'Mei 2026',statusSPP:'Lunas',keterangan:''},
+];
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let S = {
+  user: null, page: null, prevPage: null,
+  msView: 'siswa',   // master siswa sub-view
+  msPage: 1, msSearch: '',
+  sppFilt: 'semua', sppPage: 1,
+  pltCabang: 'semua', pltProg: 'semua',
+  selStat: 'Lunas',  // catat pembayaran status
+  catStu: null,      // selected student in catat
+  msKelasId: 'KLS-001', // selected class for kelas_siswa view
+};
+let parsed = {};   // smart input parsed data
+
+/* ══════════════════════════════════════════
+   DB (localStorage-backed)
+══════════════════════════════════════════ */
+let db = {
+  students: JSON.parse(JSON.stringify(DEF_STU)),
+  kelas: JSON.parse(JSON.stringify(DEF_KELAS)),
+  jadwal: JSON.parse(JSON.stringify(DEF_JDW)),
+  plotting: JSON.parse(JSON.stringify(DEF_PLT)),
+  trx: JSON.parse(JSON.stringify(DEF_TRX)),
+};
+(function loadDB(){
+  try{const s=localStorage.getItem('simbv3');if(s)db={...db,...JSON.parse(s)}}catch(e){}
+})();
+function save(){try{localStorage.setItem('simbv3',JSON.stringify(db))}catch(e){}}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function rp(n){return'Rp'+Number(n).toLocaleString('id-ID')}
+function fmtDate(d){if(!d)return'-';const x=new Date(d);if(isNaN(x))return d;return x.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function todayStr(){const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${dd}`}
+function gStu(id){return db.students.find(s=>s.id===id)}
+function gKls(id){return db.kelas.find(c=>c.id===id)}
+function genStuId(){const yr=String(new Date().getFullYear()).slice(-2);const nums=db.students.filter(s=>s.id.startsWith('BIM-'+yr+'-')).map(s=>parseInt(s.id.split('-')[2]||0)).filter(n=>!isNaN(n));const mx=nums.length?Math.max(...nums):0;return`BIM-${yr}-${String(mx+1).padStart(6,'0')}`}
+function genTrxId(){const mx=db.trx.map(t=>parseInt(t.id.replace('SPP-',''))||0).reduce((a,b)=>Math.max(a,b),0);return'SPP-'+String(mx+1).padStart(4,'0')}
+function genPltId(){const mx=db.plotting.map(p=>parseInt(p.id.replace('PLT-',''))||0).reduce((a,b)=>Math.max(a,b),0);return'PLT-'+String(mx+1).padStart(3,'0')}
+function paginate(arr,pg,pp=5){return arr.slice((pg-1)*pp,pg*pp)}
+function pgHTML(total,pg,pp,fn){
+  const tp=Math.ceil(total/pp);if(tp<=1)return'';
+  let h=`<div class="pgn"><div class="pgb" onclick="${fn}(Math.max(1,${pg}-1))">Prev ←</div>`;
+  for(let i=1;i<=Math.min(tp,5);i++)h+=`<div class="pgb${i===pg?' act':''}" onclick="${fn}(${i})">${i}</div>`;
+  h+=`<div class="pgb" onclick="${fn}(Math.min(${tp},${pg}+1))">Next →</div></div>`;
+  return h;
+}
+function badgeStu(st){const m={Aktif:'b-aktif',Inden:'b-inden',Keluar:'b-keluar','Non-Aktif':'b-nonaktif'};return`<span class="badge ${m[st]||'b-nonaktif'}">${st}</span>`}
+function badgeSPP(st){const m={Lunas:'b-lunas','Belum Bayar':'b-belum',Tunggakan:'b-tunggak'};return`<span class="badge ${m[st]||'b-belum'}">${st}</span>`}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.innerHTML=(ok?'✅ ':'❌ ')+msg;t.style.background=ok?'var(--gd)':'var(--red)';t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3200)}
+function openMod(html){const o=document.getElementById('mOv');o.innerHTML=html;o.classList.remove('hidden')}
+function closeMod(e){if(!e||e.target===document.getElementById('mOv'))document.getElementById('mOv').classList.add('hidden')}
+
+/* ══════════════════════════════════════════
+   LOGO
+══════════════════════════════════════════ */
+function logoHTML(){
+  const spokes=Array.from({length:12},(_,i)=>{
+    const a=(i*30)*Math.PI/180,x1=35+13*Math.cos(a),y1=35+13*Math.sin(a),x2=35+22*Math.cos(a),y2=35+22*Math.sin(a);
+    return`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#2E7D32" stroke-width="1.4"/>`;
+  }).join('');
+  return`<div style="display:flex;align-items:center;gap:10px;padding:3px 0">
+    <svg width="52" height="52" viewBox="0 0 70 70">
+      <circle cx="35" cy="35" r="31" fill="none" stroke="#1B5E20" stroke-width="2"/>
+      <circle cx="35" cy="35" r="22" fill="none" stroke="#2E7D32" stroke-width="1.2"/>
+      <circle cx="35" cy="35" r="4" fill="#1B5E20"/>${spokes}
+    </svg>
+    <div><div style="font-size:10px;color:#888;font-weight:600;letter-spacing:1px">bimbel</div>
+    <div style="font-family:Georgia,serif;font-size:19px;color:var(--gd);font-weight:700;line-height:1.1">Bimasakti</div></div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
+function doLogin(){
+  const u=document.getElementById('lUser').value.trim();
+  const p=document.getElementById('lPass').value;
+  const user=USERS.find(x=>x.username===u&&x.password===p);
+  const eu=document.getElementById('lUser'),ep=document.getElementById('lPass'),er=document.getElementById('lErr');
+  if(!user){er.innerHTML='❌ Username atau password salah. Silakan coba lagi.';eu.classList.add('err');ep.classList.add('err');return}
+  eu.classList.remove('err');ep.classList.remove('err');er.innerHTML='';
+  S.user=user;
+  const def={admin:'admin_dashboard',akuntan:'akuntan_dashboard',owner:'owner_laporan'};
+  go(def[user.role]);
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function go(page){
+  if(!page)return;
+  S.prevPage=S.page;S.page=page;
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appLayout').classList.remove('hidden');
+  renderSidebar();renderTopbar();renderPage(page);
+}
+
+function renderSidebar(){
+  const r=S.user.role;
+  const its=r==='admin'?[
+    {p:'admin_dashboard',i:'⊞',l:'Dashboard'},
+    {p:'admin_smart_input',i:'⌨',l:'Smart Input'},
+    {p:'admin_plotting',i:'👥',l:'Plotting & Jadwal Kelas'},
+    {p:'admin_master_siswa',i:'🗄',l:'Master Siswa'},
+    {sep:true},
+    {p:'admin_pengaturan',i:'⚙',l:'Pengaturan'},
+    {p:'keluar',i:'🚪',l:'Keluar',red:true},
+  ]:r==='akuntan'?[
+    {p:'akuntan_dashboard',i:'⊞',l:'Dashboard'},
+    {p:'akuntan_spp',i:'💰',l:'Database SPP',
+     sub:[{p:'akuntan_catat',i:'➕',l:'Catat Pembayaran'}]},
+    {p:'akuntan_master_ro',i:'👥',l:'Data Siswa (View)'},
+    {p:'akuntan_laporan',i:'📋',l:'Laporan Keuangan'},
+    {sep:true},
+    {p:'akuntan_pengaturan',i:'⚙',l:'Pengaturan'},
+    {p:'keluar',i:'🚪',l:'Keluar',red:true},
+  ]:[
+    {p:'owner_laporan',i:'📊',l:'Laporan'},
+    {sep:true},
+    {p:'owner_pengaturan',i:'⚙',l:'Pengaturan'},
+    {p:'keluar',i:'🚪',l:'Keluar',red:true},
+  ];
+  let h=`<div class="sb-logo">${logoHTML()}</div><div class="sb-nav">`;
+  for(const it of its){
+    if(it.sep){h+='<div class="nav-sep"></div>';continue}
+    const act=S.page===it.p||(it.sub&&it.sub.some(s=>s.p===S.page));
+    h+=`<div class="nav-it${act?' active':''}${it.red?' red-nav':''}" onclick="go('${it.p}')">
+      <span class="nav-ico">${it.i}</span><span>${it.l}</span></div>`;
+    if(it.sub&&(act||S.page==='akuntan_catat')){
+      for(const sub of it.sub){
+        h+=`<div class="nav-it nav-sub${S.page===sub.p?' active':''}" onclick="event.stopPropagation();go('${sub.p}')">
+          <span class="nav-ico">${sub.i}</span><span>${sub.l}</span></div>`;
+      }
+    }
+  }
+  h+='</div>';
+  document.getElementById('sidebar').innerHTML=h;
+}
+
+function renderTopbar(){
+  const u=S.user;
+  const av={admin:'👤',akuntan:'🖨',owner:'👨'}[u.role];
+  const pg=u.role+'_pengaturan';
+  document.getElementById('topbar').innerHTML=`
+    <span class="tb-title">Sistem Informasi Manajemen</span>
+    <div class="srch"><span>🔍</span><input id="gSearch" placeholder="Cari ID Siswa" onkeydown="if(event.key==='Enter')gSearchFn()"></div>
+    <div class="prof" onclick="go('${pg}')">
+      <div class="prof-txt"><div class="prof-name">${u.name}</div><div class="prof-role">${u.title}</div></div>
+      <div class="avatar av-${u.role}">${av}</div>
+    </div>`;
+}
+
+function gSearchFn(){
+  const q=document.getElementById('gSearch')?.value?.trim();
+  if(!q)return;
+  S.msSearch=q;S.msPage=1;
+  if(S.user.role==='admin'){S.msView='siswa';go('admin_master_siswa')}
+  else if(S.user.role==='akuntan')go('akuntan_master_ro');
+}
+
+/* ══════════════════════════════════════════
+   PAGE ROUTER
+══════════════════════════════════════════ */
+let _charts=[];
+function renderPage(pg){
+  _charts.forEach(c=>{try{c.destroy()}catch(e){}});_charts=[];
+  const area=document.getElementById('content');
+  const map={
+    admin_dashboard:pgAdminDash,
+    admin_smart_input:pgSmartInput,
+    admin_plotting:pgPlotting,
+    admin_master_siswa:pgMasterSiswa,
+    admin_pengaturan:pgPengaturan,
+    akuntan_dashboard:pgAkuntanDash,
+    akuntan_spp:pgSPP,
+    akuntan_catat:pgCatat,
+    akuntan_laporan:pgLaporan,
+    akuntan_master_ro:pgMasterRO,
+    akuntan_pengaturan:pgPengaturan,
+    owner_laporan:pgOwnerLaporan,
+    owner_pengaturan:pgPengaturan,
+    keluar:pgKeluar,
+  };
+  if(map[pg]){area.innerHTML=map[pg]();if(pg==='owner_laporan')setTimeout(initCharts,50);}
+  else area.innerHTML='<p style="padding:20px">Halaman tidak ditemukan.</p>';
+}
+
+/* ══════════════════════════════════════════
+   PAGE: ADMIN DASHBOARD
+══════════════════════════════════════════ */
+function pgAdminDash(){
+  const aktif=db.students.filter(s=>s.status==='Aktif').length;
+  const inden=db.students.filter(s=>s.status==='Inden').length;
+  const kAktif=db.kelas.filter(c=>c.status==='Aktif').length;
+  return`<div style="font-family:Georgia,serif;font-size:30px;font-weight:800;color:#1a237e;margin-bottom:22px">👋 Selamat Datang, Admin!</div>
+  <div class="qnav">
+    <button class="qb" onclick="go('admin_smart_input')"><span class="qb-dot"></span> Smart Input</button>
+    <button class="qb" onclick="go('admin_plotting')"><span class="qb-dot"></span> Plotting & Jadwal Kelas</button>
+    <button class="qb" onclick="go('admin_master_siswa')"><span class="qb-dot"></span> Master Siswa</button>
+  </div>
+  <div class="dash-stats">
+    <div class="stat-bl"><div class="st-lbl">Siswa Aktif</div><div class="st-val">${aktif}</div></div>
+    <div class="stat-bl"><div class="st-lbl">Pendaftar Baru (Inden)</div><div class="st-val">${inden}</div></div>
+    <div class="stat-bl"><div class="st-lbl">Total Kelas Aktif</div><div class="st-val">${kAktif}</div></div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: SMART INPUT
+══════════════════════════════════════════ */
+function pgSmartInput(){
+  const newId=genStuId();
+  const recent=[...db.students].reverse().slice(0,5);
+  return`
+  <div class="si-grid">
+    <div class="si-panel">
+      <div class="si-ttl"><span class="pnum">1</span> Smart Input</div>
+      <div class="wa-hint">
+        Nama Lengkap Siswa : ...<br>Nama Panggilan : ...<br>Tanggal Lahir : ...<br>
+        Tingkat Kelas : ...<br>Sekolah : ...<br>Nomor Whatsapp Ortu/Wali : ...<br>
+        Nomor Whatsapp Siswa : ...<br>Alamat : ...<br>Sumber Info : ...
+      </div>
+      <textarea class="fc" id="waIn" rows="9" placeholder="Tempel teks dari WA di sini..." oninput="liveWA()"></textarea>
+      <button class="btn btn-p" style="width:100%;margin-top:10px" onclick="extractWA()">📤 Ekstrak Data</button>
+    </div>
+    <div class="si-panel">
+      <div class="si-ttl"><span class="pnum">2</span> Preview & Validasi</div>
+      <div style="font-size:11.5px;color:#888;margin-bottom:5px">ID Siswa : (auto-generate)</div>
+      <div class="prev-id" id="pId">${newId}</div>
+      <div style="margin-top:10px">
+        ${[['Nama Lengkap Siswa','pNama'],['Nama Panggilan','pPgl'],['Tanggal Lahir','pTgl'],['Tingkat Kelas','pKls'],['Sekolah','pSek'],['No. WA Ortu/Wali','pOrtu'],['No. WA Siswa','pSis'],['Alamat','pAl'],['Sumber Info','pSrc']].map(([l,i])=>`
+          <div class="prev-row"><span class="prev-lbl">${l}</span><span class="prev-val" id="${i}">-</span></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-s" style="flex:1" onclick="resetSI()">Reset</button>
+        <button class="btn btn-p" style="flex:1" onclick="saveSI()">💾 SIMPAN</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:11px">Siswa Terbaru Ditambahkan</div>
+    <div class="tbl-box"><table class="dtbl"><thead><tr>
+      <th>ID Siswa</th><th>Nama</th><th>Nama Panggilan</th><th>Tgl Lahir</th>
+    </tr></thead><tbody>
+      ${recent.map(s=>`<tr>
+        <td class="idlnk" onclick="showStuDet('${s.id}')">${s.id}</td>
+        <td>${s.namaLengkap}</td><td>${s.namaPanggilan}</td><td>${s.tglLahir}</td>
+      </tr>`).join('')||'<tr><td colspan="4" style="color:#999">Belum ada data</td></tr>'}
+    </tbody></table></div>
+  </div>`;
+}
+function liveWA(){const t=document.getElementById('waIn')?.value||'';if(t.length>15)doParseWA(t)}
+function extractWA(){const t=document.getElementById('waIn')?.value||'';if(!t.trim()){toast('Masukkan teks WA terlebih dahulu!',false);return}doParseWA(t);toast('Data berhasil diekstrak!')}
+function doParseWA(text){
+  const ex=(pats)=>{for(const p of pats){const m=text.match(p);if(m&&m[1])return m[1].trim()}return''};
+  parsed={
+    namaLengkap:ex([/nama lengkap siswa\s*[:\-]\s*(.+)/i,/nama lengkap\s*[:\-]\s*(.+)/i]),
+    namaPanggilan:ex([/nama panggilan\s*[:\-]\s*(.+)/i,/panggilan\s*[:\-]\s*(.+)/i]),
+    tglLahir:ex([/tanggal lahir\s*[:\-]\s*(.+)/i,/tgl\.?\s*lahir\s*[:\-]\s*(.+)/i]),
+    tingkatKelas:ex([/tingkat kelas\s*[:\-]\s*(.+)/i]),
+    sekolah:ex([/sekolah\s*[:\-]\s*(.+)/i,/asal sekolah\s*[:\-]\s*(.+)/i]),
+    noHpOrtu:ex([/nomor whatsapp ortu\/wali\s*[:\-]\s*(.+)/i,/wa ortu\s*[:\-]\s*(.+)/i,/hp ortu\s*[:\-]\s*(.+)/i]),
+    noHpSiswa:ex([/nomor whatsapp siswa\s*[:\-]\s*(.+)/i,/wa siswa\s*[:\-]\s*(.+)/i,/hp siswa\s*[:\-]\s*(.+)/i]),
+    alamat:ex([/alamat\s*[:\-]\s*(.+)/i]),
+    sumberInfo:ex([/sumber info\s*[:\-]\s*(.+)/i,/sumber\s*[:\-]\s*(.+)/i]),
+  };
+  const set=(id,v)=>{const el=document.getElementById(id);if(el){el.textContent=v||'-';el.style.color=v?'#333':'#bbb'}};
+  set('pNama',parsed.namaLengkap);set('pPgl',parsed.namaPanggilan);set('pTgl',parsed.tglLahir);
+  set('pKls',parsed.tingkatKelas);set('pSek',parsed.sekolah);set('pOrtu',parsed.noHpOrtu);
+  set('pSis',parsed.noHpSiswa);set('pAl',parsed.alamat);set('pSrc',parsed.sumberInfo);
+}
+function resetSI(){parsed={};document.getElementById('waIn').value='';['pNama','pPgl','pTgl','pKls','pSek','pOrtu','pSis','pAl','pSrc'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='-';el.style.color='#bbb'}});document.getElementById('pId').textContent=genStuId()}
+function saveSI(){
+  if(!parsed.namaLengkap){toast('Ekstrak data WA terlebih dahulu!',false);return}
+  const nid=genStuId();const td=todayStr();const now=new Date().toLocaleString('id-ID');
+  db.students.push({id:nid,namaLengkap:parsed.namaLengkap||'',namaPanggilan:parsed.namaPanggilan||'',tglLahir:parsed.tglLahir||'',tingkatKelas:parsed.tingkatKelas||'',sekolah:parsed.sekolah||'',noHpOrtu:parsed.noHpOrtu||'',noHpSiswa:parsed.noHpSiswa||'',alamat:parsed.alamat||'',sumberInfo:parsed.sumberInfo||'',tglMendaftar:td,status:'Inden',createdAt:now});
+  save();toast(`Siswa ${parsed.namaLengkap} (${nid}) berhasil disimpan!`);
+  parsed={};renderPage('admin_smart_input');
+}
+
+/* ══════════════════════════════════════════
+   PAGE: PLOTTING & JADWAL
+══════════════════════════════════════════ */
+function pgPlotting(){
+  const cabs=[...new Set(db.kelas.map(c=>c.cabang))];
+  const progs=[...new Set(db.kelas.map(c=>c.program))];
+  let avjdw=db.jadwal.filter(j=>{const k=gKls(j.idKelas);return k&&k.status==='Aktif'&&(k.kuotaTersedia-k.kuotaTerisi)>0});
+  if(S.pltCabang!=='semua')avjdw=avjdw.filter(j=>{const k=gKls(j.idKelas);return k&&k.cabang===S.pltCabang});
+  if(S.pltProg!=='semua')avjdw=avjdw.filter(j=>{const k=gKls(j.idKelas);return k&&k.program===S.pltProg});
+  return`
+  <div class="fbar">
+    <span style="font-size:13px;font-weight:700">Cabang:</span>
+    <select class="fsel" onchange="S.pltCabang=this.value;renderPage('admin_plotting')">
+      <option value="semua">SEMUA</option>${cabs.map(c=>`<option value="${c}"${S.pltCabang===c?' selected':''}>${c}</option>`).join('')}
+    </select>
+    <span style="font-size:13px;font-weight:700">Program:</span>
+    <select class="fsel" onchange="S.pltProg=this.value;renderPage('admin_plotting')">
+      <option value="semua">SEMUA</option>${progs.map(p=>`<option value="${p}"${S.pltProg===p?' selected':''}>${p}</option>`).join('')}
+    </select>
+    <button class="fbtn" onclick="S.pltCabang='semua';S.pltProg='semua';renderPage('admin_plotting')">FILTER</button>
+  </div>
+  <div class="plt-grid">
+    <div class="plt-panel">
+      <div class="plt-ttl"><span>➕</span> ALOKASI SISWA BARU</div>
+      <div class="fg">
+        <label class="fl">ID Siswa:</label>
+        <div class="ac-wrap">
+          <input class="fc" id="pStuId" placeholder="Ketik ID atau nama siswa..." oninput="stuAC(this.value,'pStuAC','pStuId','pStuName')">
+          <div id="pStuAC" class="ac-dd hidden"></div>
+        </div>
+      </div>
+      <div class="fg"><input class="fc" id="pStuName" placeholder="NAMA LENGKAP SISWA" readonly style="background:#f5f5f5;font-weight:600"></div>
+      <div class="fg">
+        <label class="fl">Program Les:</label>
+        <select class="fc" id="pProg" onchange="updatePltJdw()">
+          <option value="">-- Pilih Program --</option>${progs.map(p=>`<option value="${p}">${p.toUpperCase()}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Cabang:</label>
+        <select class="fc" id="pCab" onchange="updatePltJdw()">
+          <option value="">-- Pilih Cabang --</option>${cabs.map(c=>`<option value="${c}">${c.toUpperCase()}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Jadwal:</label>
+        <select class="fc" id="pJdw"><option value="">-- Pilih Jadwal --</option></select>
+      </div>
+      <div class="fg">
+        <label class="fl">Tutor:</label>
+        <select class="fc" id="pTutor"><option value="">-- Pilih Tutor --</option><option>Mr. BAGUS</option><option>Ms. DEWI</option><option>Mr. ANDI</option><option>Ms. SARI</option></select>
+      </div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="savePlt()">💾 SIMPAN</button>
+    </div>
+    <div class="plt-panel">
+      <div class="plt-ttl">📅 JADWAL KELAS AKTIF <small style="font-size:10px;color:#888;margin-left:auto">(Masih ada kuota)</small></div>
+      <div class="tbl-box"><table class="dtbl"><thead><tr><th>ID Jadwal</th><th>ID Kelas</th><th>Hari</th><th>Sesi</th></tr></thead><tbody>
+        ${avjdw.slice(0,8).map(j=>{const k=gKls(j.idKelas);return`<tr><td>${j.id}</td><td>${j.idKelas}${k?` (${k.namaKelas})`:''}</td><td>${j.hari}</td><td>${j.sesi}</td></tr>`}).join('')||'<tr><td colspan="4" style="color:#999">Tidak ada jadwal tersedia</td></tr>'}
+      </tbody></table></div>
+    </div>
+  </div>`;
+}
+function stuAC(val,acId,inId,nameId){
+  const ac=document.getElementById(acId);
+  if(!val||val.length<2){ac.classList.add('hidden');return}
+  const ms=db.students.filter(s=>s.id.toLowerCase().includes(val.toLowerCase())||s.namaLengkap.toLowerCase().includes(val.toLowerCase())).slice(0,7);
+  if(!ms.length){ac.classList.add('hidden');return}
+  ac.innerHTML=ms.map(s=>`<div class="ac-it" onclick="selStu('${s.id}','${inId}','${nameId}','${acId}')">${s.id} – ${s.namaLengkap} <span class="badge b-${s.status==='Aktif'?'aktif':'inden'}" style="font-size:10px">${s.status}</span></div>`).join('');
+  ac.classList.remove('hidden');
+}
+function selStu(id,inId,nameId,acId){
+  const s=gStu(id);if(!s)return;
+  document.getElementById(inId).value=s.id;
+  document.getElementById(nameId).value=s.namaLengkap;
+  document.getElementById(acId).classList.add('hidden');
+  const k=s.tingkatKelas?.toLowerCase()||'';
+  const pg=document.getElementById('pProg');
+  if(pg){if(k.includes('tk'))pg.value='TK';else if(k.includes('sd')||k.includes('calis'))pg.value='SD';else if(k.includes('smp'))pg.value='SMP';else if(k.includes('sma'))pg.value='SMA';}
+  updatePltJdw();
+}
+function updatePltJdw(){
+  const prog=document.getElementById('pProg')?.value;const cab=document.getElementById('pCab')?.value;
+  const sel=document.getElementById('pJdw');if(!sel)return;
+  let cls=db.kelas.filter(c=>c.status==='Aktif'&&(c.kuotaTersedia-c.kuotaTerisi)>0&&(!prog||c.program===prog)&&(!cab||c.cabang===cab));
+  const jdws=db.jadwal.filter(j=>cls.some(c=>c.id===j.idKelas));
+  sel.innerHTML=`<option value="">-- Pilih Jadwal --</option>`+jdws.map(j=>{const c=gKls(j.idKelas);return`<option value="${j.id}|${j.idKelas}">${j.hari} / ${j.sesi} – ${c?.namaKelas||j.idKelas} (sisa ${c?c.kuotaTersedia-c.kuotaTerisi:0})</option>`}).join('');
+}
+function savePlt(){
+  const sid=document.getElementById('pStuId')?.value;const jv=document.getElementById('pJdw')?.value;const tutor=document.getElementById('pTutor')?.value;
+  if(!sid||!jv||!tutor){toast('Lengkapi semua field!',false);return}
+  const[jid,kid]=jv.split('|');const stu=gStu(sid);const cls=gKls(kid);
+  if(!stu||!cls){toast('Data tidak valid!',false);return}
+  if(db.plotting.find(p=>p.idSiswa===sid&&p.idKelas===kid&&!p.tglSelesai)){toast('Siswa sudah terdaftar di kelas ini!',false);return}
+  db.plotting.push({id:genPltId(),idSiswa:sid,namaLengkap:stu.namaLengkap,idKelas:kid,tglMulai:todayStr().split('-').reverse().join('-'),tglSelesai:'',tutor});
+  cls.kuotaTerisi=Math.min(cls.kuotaTersedia,cls.kuotaTerisi+1);
+  if(cls.kuotaTerisi>=cls.kuotaTersedia)cls.status='Penuh';
+  stu.status='Aktif';save();
+  toast(`${stu.namaLengkap} berhasil di-plotting ke ${cls.namaKelas}!`);renderPage('admin_plotting');
+}
+
+/* ══════════════════════════════════════════
+   PAGE: MASTER SISWA
+══════════════════════════════════════════ */
+function pgMasterSiswa(){
+  const v=S.msView;
+  let title='DATABASE SISWA',sub='Biodata, status, dan alokasi jadwal',body='';
+
+  if(v==='siswa'){
+    let data=db.students;
+    if(S.msSearch)data=data.filter(s=>s.id.toLowerCase().includes(S.msSearch.toLowerCase())||s.namaLengkap.toLowerCase().includes(S.msSearch.toLowerCase()));
+    const pg=paginate(data,S.msPage);
+    const aktif=db.students.filter(s=>s.status==='Aktif').length;
+    const inden=db.students.filter(s=>s.status==='Inden').length;
+    const klr=db.students.filter(s=>['Keluar','Non-Aktif'].includes(s.status)).length;
+    body=`<div class="ms-grid">
+      <div>
+        ${S.msSearch?`<div style="font-size:12.5px;color:#888;margin-bottom:9px">🔍 Hasil: "${S.msSearch}" – <span class="idlnk" onclick="S.msSearch='';S.msPage=1;renderPage('admin_master_siswa')">Reset</span></div>`:''}
+        <div class="tbl-box"><table class="dtbl"><thead><tr><th>ID Siswa</th><th>Nama</th><th>Tingkat Kelas</th><th>Asal Sekolah</th><th>Status</th></tr></thead><tbody>
+          ${pg.map(s=>`<tr><td class="idlnk" onclick="showStuDet('${s.id}')">${s.id}</td><td style="text-align:left">${s.namaLengkap}</td><td>${s.tingkatKelas}</td><td>${s.sekolah}</td><td>${badgeStu(s.status)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:#999">Tidak ada data</td></tr>'}
+        </tbody></table></div>
+        <div class="tbl-foot"><button class="btn btn-o" style="font-size:12px;padding:6px 13px">✏️ Edit Data Siswa</button>${pgHTML(data.length,S.msPage,5,'msGoP')}</div>
+      </div>
+      <div class="ring-panel"><div style="font-size:13.5px;font-weight:700;margin-bottom:11px">Ringkasan Informasi Siswa</div>
+        <div class="ri-item ri-g"><div class="ri-lbl">👤 Jumlah Siswa Aktif</div><div class="ri-val">${aktif}</div></div>
+        <div class="ri-item ri-y"><div class="ri-lbl">👤 Jumlah Siswa Inden</div><div class="ri-val">${inden}</div></div>
+        <div class="ri-item ri-r"><div class="ri-lbl">👤 Jumlah Siswa Keluar</div><div class="ri-val">${klr}</div></div>
+      </div>
+    </div>`;
+
+  }else if(v==='kelas'){
+    title='DATABASE KELAS';sub='Klik baris kelas untuk melihat siswanya';
+    if(!S.msKelasId||!gKls(S.msKelasId)) S.msKelasId=db.kelas[0]?.id;
+    const selKls=gKls(S.msKelasId)||db.kelas[0];
+    const jdws=db.jadwal.filter(j=>j.idKelas===selKls.id);
+    const plts=db.plotting.filter(p=>p.idKelas===selKls.id&&!p.tglSelesai);
+    const jdwStr=jdws.length?jdws.map(j=>`${j.hari} (${j.jamMulai}–${j.jamSelesai} WIB)`).join(' dan '):'Belum ada jadwal';
+    body=`<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:start">
+      <div>
+        <div class="tbl-box"><table class="dtbl"><thead><tr>
+          <th>ID_KELAS</th><th>Nama Kelas</th><th>Program</th><th>Kuota</th><th>Terisi</th><th>Sisa</th><th>Status</th>
+        </tr></thead><tbody>
+          ${db.kelas.map(c=>`<tr style="cursor:pointer;background:${c.id===selKls.id?'#e8f5e9':'#fff'}" onclick="S.msKelasId='${c.id}';S.msPage=1;renderPage('admin_master_siswa')">
+            <td style="color:var(--gd);font-weight:700">${c.id}</td>
+            <td>${c.namaKelas}</td><td>${c.program}</td>
+            <td>${c.kuotaTersedia}</td><td>${c.kuotaTerisi}</td>
+            <td><strong>${c.kuotaTersedia-c.kuotaTerisi}</strong></td>
+            <td>${c.status==='Aktif'?'<span class="badge b-aktif">Aktif</span>':c.status==='Penuh'?'<span class="badge b-nonaktif">Penuh</span>':'<span class="badge b-nonaktif">'+c.status+'</span>'}</td>
+          </tr>`).join('')}
+        </tbody></table></div>
+        <div class="tbl-foot">
+          <button class="btn btn-o" style="font-size:12px;padding:6px 13px" onclick="openEditKelas('${selKls.id}')">✏️ Edit Kelas Terpilih</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:800;color:var(--gd);margin-bottom:7px">
+          📚 ${selKls.namaKelas} <span style="color:#888;font-size:12px;font-weight:400">(${selKls.id})</span>
+        </div>
+        <div class="kls-info" style="line-height:2;margin-bottom:10px">
+          📅 <strong>Jadwal:</strong> ${jdwStr}<br>
+          👥 <strong>Siswa aktif:</strong> ${plts.length} / ${selKls.kuotaTersedia} kuota &nbsp;<span class="badge b-${selKls.status==='Aktif'?'aktif':selKls.status==='Penuh'?'nonaktif':'inden'}">${selKls.status}</span>
+        </div>
+        <div class="tbl-box"><table class="dtbl"><thead><tr>
+          <th>ID_SISWA (FK)</th><th>Nama Lengkap</th>
+        </tr></thead><tbody>
+          ${paginate(plts,S.msPage,5).map(p=>`<tr>
+            <td class="idlnk" onclick="showStuDet('${p.idSiswa}')">${p.idSiswa}</td>
+            <td style="text-align:left">${p.namaLengkap}</td>
+          </tr>`).join('')||'<tr><td colspan="2" style="color:#999;padding:16px">Belum ada siswa aktif di kelas ini</td></tr>'}
+        </tbody></table></div>
+        <div class="tbl-foot">${pgHTML(plts.length,S.msPage,5,'msGoP')}</div>
+      </div>
+    </div>`;
+
+  }else if(v==='jadwal'){
+    title='DATABASE JADWAL';sub='Nama kelas, hari, sesi, dan jam';
+    const pg=paginate(db.jadwal,S.msPage);
+    body=`<div class="tbl-box"><table class="dtbl"><thead><tr>
+      <th>ID_JADWAL</th><th>ID_KELAS (FK)</th><th>Hari</th><th>Sesi</th><th>Jam Mulai</th><th>Jam Selesai</th>
+    </tr></thead><tbody>
+      ${pg.map(j=>`<tr>
+        <td>${j.id}</td><td>${j.idKelas}</td><td>${j.hari}</td>
+        <td>${j.sesi}</td><td>${j.jamMulai}</td><td>${j.jamSelesai}</td>
+      </tr>`).join('')}
+    </tbody></table></div>
+    <div class="tbl-foot">
+      <button class="btn btn-o" style="font-size:12px;padding:6px 13px">✏️ Edit Data Jadwal</button>
+      ${pgHTML(db.jadwal.length,S.msPage,5,'msGoP')}
+    </div>`;
+
+  }else if(v==='plotting'){
+    title='DATABASE PLOTTING';sub='Daftar kelas dan siswanya';
+    const pg=paginate(db.plotting,S.msPage);
+    body=`<div class="tbl-box"><table class="dtbl"><thead><tr>
+      <th>ID_PLOTTING</th><th>ID_SISWA (FK)</th><th>Nama Lengkap (FK)</th>
+      <th>ID_KELAS (FK)</th><th>Tgl Mulai</th><th>Tgl Selesai (kosong=aktif)</th>
+    </tr></thead><tbody>
+      ${pg.map(p=>`<tr>
+        <td>${p.id}</td>
+        <td class="idlnk" onclick="showStuDet('${p.idSiswa}')">${p.idSiswa}</td>
+        <td>${p.namaLengkap}</td>
+        <td class="idlnk" onclick="goKelasView('${p.idKelas}')">${p.idKelas}</td>
+        <td>${p.tglMulai}</td><td>${p.tglSelesai||''}</td>
+      </tr>`).join('')||'<tr><td colspan="6" style="color:#999">Tidak ada data</td></tr>'}
+    </tbody></table></div>
+    <div class="tbl-foot">
+      <button class="btn btn-o" style="font-size:12px;padding:6px 13px">✏️ Edit Data Plotting</button>
+      ${pgHTML(db.plotting.length,S.msPage,5,'msGoP')}
+    </div>`;
+
+  }else if(v==='kelas_siswa'){
+    // ── DAFTAR SISWA PER KELAS ──
+    const kls = gKls(S.msKelasId) || db.kelas[0];
+    if(!S.msKelasId) S.msKelasId = kls.id;
+    title = `Daftar Siswa Kelas`;
+    sub   = `${kls.id} (${kls.namaKelas})`;
+
+    // jadwal kelas terpilih
+    const jdws = db.jadwal.filter(j=>j.idKelas===kls.id);
+    const jdwStr = jdws.length
+      ? jdws.map(j=>`${j.hari} (${j.jamMulai}-${j.jamSelesai} WIB)`).join(' dan ')
+      : 'Belum ada jadwal';
+
+    // siswa aktif di kelas ini (via plotting)
+    let plts = db.plotting.filter(p=>p.idKelas===kls.id && !p.tglSelesai);
+    const pgd = paginate(plts, S.msPage, 5);
+
+    // dropdown pilih kelas
+    const kelasDropdown = db.kelas.map(c=>`<option value="${c.id}"${c.id===kls.id?' selected':''}>${c.namaKelas}</option>`).join('');
+
+    body=`
+    <!-- INFO BOX JADWAL -->
+    <div class="card" style="padding:12px 16px;margin-bottom:14px;font-size:13px;color:#444">
+      <strong>Kelas hari:</strong> ${jdwStr}
+    </div>
+
+    <!-- TABEL SISWA -->
+    <div class="tbl-box"><table class="dtbl">
+      <thead><tr>
+        <th style="width:45%">ID_SISWA (FK)</th>
+        <th>Nama Lengkap</th>
+      </tr></thead>
+      <tbody>
+        ${pgd.map(p=>`<tr>
+          <td class="idlnk" onclick="showStuDet('${p.idSiswa}')">${p.idSiswa}</td>
+          <td>${p.namaLengkap}</td>
+        </tr>`).join('')||`<tr><td colspan="2" style="color:#999;padding:18px">Belum ada siswa terdaftar di kelas ini</td></tr>`}
+      </tbody>
+    </table></div>
+
+    <div class="tbl-foot">
+      <button class="btn btn-o" style="font-size:12px;padding:6px 13px">
+        ✏️ Edit Data Kelas ${kls.namaKelas}
+      </button>
+      ${pgHTML(plts.length, S.msPage, 5, 'msGoP')}
+    </div>`;
+
+    // Override title area to include class selector (injected via titleExtra below)
+    return `
+    <div class="pa-bar">
+      <div class="db-title" style="font-size:16px">Daftar Siswa Kelas<br><span style="font-size:13px;font-weight:600;color:#555">${kls.id} (${kls.namaKelas})</span></div>
+
+      <!-- DROPDOWN PILIH KELAS -->
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #ddd;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">
+        <span>Kelas</span>
+        <select style="border:none;outline:none;font-size:13px;font-weight:700;cursor:pointer;background:transparent;min-width:60px"
+          onchange="S.msKelasId=this.value;S.msPage=1;renderPage('admin_master_siswa')">
+          ${kelasDropdown}
+        </select>
+      </div>
+
+      <button class="abt" onclick="go('admin_plotting')"><span>📅</span> Plotting Jadwal</button>
+      <button class="abt abt-p" onclick="go('admin_smart_input')"><span>👤+</span> Tambah Siswa</button>
+    </div>
+
+    <!-- DROPDOWN VIEW SELECTOR (kecil, di bawah action bar) -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select class="fsel" style="min-width:185px"
+        onchange="S.msView=this.value;S.msPage=1;renderPage('admin_master_siswa')">
+        <option value="siswa">Master Data Siswa</option>
+        <option value="kelas">Data Kelas</option>
+        <option value="jadwal">Data Jadwal</option>
+        <option value="plotting">Data Plotting</option>
+        <option value="kelas_siswa" selected>Daftar Siswa Per Kelas</option>
+      </select>
+      <span style="font-size:12px;color:#888">${kls.kuotaTerisi} siswa aktif / ${kls.kuotaTersedia} kuota</span>
+    </div>
+
+    ${body}`;
+  }
+
+  // ── DEFAULT RETURN (untuk view selain kelas_siswa) ──
+  return`
+  <div class="pa-bar">
+    <div class="db-title">${title}</div>
+    <select class="fsel" style="min-width:185px"
+      onchange="S.msView=this.value;S.msPage=1;renderPage('admin_master_siswa')">
+      <option value="siswa"          ${v==='siswa'?'selected':''}>Master Data Siswa</option>
+      <option value="kelas"          ${v==='kelas'?'selected':''}>Data Kelas</option>
+      <option value="jadwal"         ${v==='jadwal'?'selected':''}>Data Jadwal</option>
+      <option value="plotting"       ${v==='plotting'?'selected':''}>Data Plotting</option>
+      <option value="kelas_siswa"    ${v==='kelas_siswa'?'selected':''}>Daftar Siswa Per Kelas</option>
+    </select>
+    <button class="abt" onclick="go('admin_plotting')"><span>📅</span> Plotting Jadwal</button>
+    <button class="abt abt-p" onclick="go('admin_smart_input')"><span>👤+</span> Tambah Siswa</button>
+  </div>
+  <div class="db-sub">${sub}</div>
+  ${body}`;
+}
+function msGoP(p){S.msPage=p;renderPage('admin_master_siswa')}
+
+// Helper: langsung ke view Daftar Siswa Kelas tertentu
+function goKelasView(kelasId){
+  S.msView='kelas_siswa';
+  S.msKelasId=kelasId;
+  S.msPage=1;
+  renderPage('admin_master_siswa');
+}
+
+function showStuDet(id){
+  const s=gStu(id);if(!s)return;
+  const plts=db.plotting.filter(p=>p.idSiswa===id);
+  openMod(`<div class="mbox" style="max-width:560px;text-align:left;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="font-size:16px;font-weight:700">Detail Siswa</h2>${badgeStu(s.status)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      ${[['ID Siswa',s.id],['Nama Lengkap',s.namaLengkap],['Panggilan',s.namaPanggilan],['Tgl Lahir',s.tglLahir],['Tingkat Kelas',s.tingkatKelas],['Sekolah',s.sekolah],['No HP Ortu',s.noHpOrtu],['No HP Siswa',s.noHpSiswa],['Alamat',s.alamat],['Sumber Info',s.sumberInfo],['Tgl Mendaftar',s.tglMendaftar]].map(([k,v])=>`<div><div style="font-size:11px;color:#888;font-weight:600">${k}</div><div style="font-size:13px;font-weight:600;margin-top:2px">${v||'-'}</div></div>`).join('')}
+    </div>
+    ${plts.length?`<div style="border-top:1px solid #eee;padding-top:10px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:7px">Kelas Aktif:</div>
+      ${plts.filter(p=>!p.tglSelesai).map(p=>{const k=gKls(p.idKelas);const j=db.jadwal.find(x=>x.idKelas===p.idKelas);return`<div style="font-size:13px;background:#f0f8f0;padding:7px 11px;border-radius:6px;margin-bottom:4px">📚 ${k?.namaKelas||p.idKelas}${j?` – ${j.hari} ${j.jamMulai}`:''}${p.tutor?` | ${p.tutor}`:''}</div>`}).join('')}
+    </div>`:''}
+    <div style="text-align:right;margin-top:14px"><button class="btn btn-s" onclick="closeMod()">Tutup</button></div>
+  </div>`);
+}
+
+/* ══════════════════════════════════════════
+   PAGE: AKUNTAN DASHBOARD
+══════════════════════════════════════════ */
+function pgAkuntanDash(){
+  const lunas=db.trx.filter(t=>t.statusSPP==='Lunas');
+  const blm=db.trx.filter(t=>t.statusSPP==='Belum Bayar');
+  const tgk=db.trx.filter(t=>t.statusSPP==='Tunggakan');
+  const tot=lunas.reduce((s,t)=>s+Number(t.nominal),0);
+  return`<div style="font-family:Georgia,serif;font-size:28px;font-weight:800;color:#1a237e;margin-bottom:20px">💰 Dashboard Akuntan</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px">
+    <div class="card sum-item si-blue" style="cursor:pointer" onclick="go('akuntan_spp')"><div class="si-lbl">💰 Total Kas Masuk</div><div class="si-val" style="font-size:22px">${rp(tot)}</div></div>
+    <div class="card sum-item si-green" style="cursor:pointer" onclick="go('akuntan_spp')"><div class="si-lbl">✅ Sudah Bayar</div><div class="si-val">${lunas.length}</div></div>
+    <div class="card sum-item si-yel" style="cursor:pointer" onclick="go('akuntan_spp')"><div class="si-lbl">⏳ Belum Bayar</div><div class="si-val">${blm.length}</div></div>
+    <div class="card sum-item si-red" style="cursor:pointer" onclick="go('akuntan_spp')"><div class="si-lbl">⚠️ Menunggak</div><div class="si-val">${tgk.length}</div></div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn btn-p" style="padding:13px 26px;font-size:14px" onclick="go('akuntan_catat')">➕ Catat Pembayaran Baru</button>
+    <button class="btn btn-o" onclick="go('akuntan_spp')">📊 Database SPP</button>
+    <button class="btn btn-o" onclick="go('akuntan_laporan')">📋 Laporan Keuangan</button>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: DATABASE SPP
+══════════════════════════════════════════ */
+function pgSPP(){
+  let data=db.trx;
+  if(S.sppFilt!=='semua')data=data.filter(t=>t.statusSPP===S.sppFilt);
+  const pg=paginate(data,S.sppPage);
+  const lunas=db.trx.filter(t=>t.statusSPP==='Lunas');
+  const blm=db.trx.filter(t=>t.statusSPP==='Belum Bayar');
+  const tgk=db.trx.filter(t=>t.statusSPP==='Tunggakan');
+  const tot=lunas.reduce((s,t)=>s+Number(t.nominal),0);
+  return`
+  <div class="pa-bar">
+    <div class="db-title">DATABASE SPP</div>
+    <select class="fsel" onchange="S.sppFilt=this.value;S.sppPage=1;renderPage('akuntan_spp')">
+      <option value="semua">Status Bayar ▼</option>
+      <option value="Lunas"${S.sppFilt==='Lunas'?' selected':''}>Lunas</option>
+      <option value="Belum Bayar"${S.sppFilt==='Belum Bayar'?' selected':''}>Belum Bayar</option>
+      <option value="Tunggakan"${S.sppFilt==='Tunggakan'?' selected':''}>Tunggakan</option>
+    </select>
+    <button class="abt" onclick="go('akuntan_laporan')">📋 Laporan Pembayaran</button>
+    <button class="abt abt-p" onclick="go('akuntan_catat')">➕ Catat Pembayaran</button>
+  </div>
+  <div class="db-sub">Biodata, nominal, status pembayaran SPP</div>
+  <div class="spp-grid">
+    <div>
+      <div class="tbl-box"><table class="dtbl"><thead><tr>
+        <th>ID Transaksi</th><th>ID Siswa</th><th>Tanggal Bayar</th><th>Nominal SPP</th><th>Metode Bayar</th><th>Kategori SPP</th><th>Status SPP</th>
+      </tr></thead><tbody>
+        ${pg.map(t=>`<tr>
+          <td>${t.id}</td>
+          <td class="idlnk" onclick="showStuDet('${t.idSiswa}')">${t.idSiswa}</td>
+          <td>${t.tglBayar?fmtDate(t.tglBayar):'-'}</td>
+          <td>${rp(t.nominal)}</td>
+          <td>${t.metodeBayar||'-'}</td>
+          <td>${t.kategoriSPP}</td>
+          <td>${badgeSPP(t.statusSPP)}</td>
+        </tr>`).join('')||'<tr><td colspan="7" style="color:#999">Tidak ada data</td></tr>'}
+      </tbody></table></div>
+      <div class="tbl-foot"><button class="btn btn-o" style="font-size:12px;padding:6px 13px" onclick="go('akuntan_catat')">✏️ Edit Data SPP</button>${pgHTML(data.length,S.sppPage,5,'sppGoP')}</div>
+    </div>
+    <div class="ring-panel">
+      <div style="font-size:13.5px;font-weight:700;margin-bottom:11px">Ringkasan Informasi SPP</div>
+      <div class="sum-item si-blue" style="border-radius:9px;padding:12px;margin-bottom:8px"><div class="si-lbl">💰 Total Kas Masuk</div><div class="si-val" style="font-size:22px">${rp(tot)}</div></div>
+      <div class="sum-item si-green" style="border-radius:9px;padding:12px;margin-bottom:8px"><div class="si-lbl">✅ Jumlah Siswa Sudah Bayar</div><div class="si-val">${lunas.length}</div></div>
+      <div class="sum-item si-yel" style="border-radius:9px;padding:12px;margin-bottom:8px"><div class="si-lbl">⏳ Jumlah Siswa Belum Bayar</div><div class="si-val">${blm.length}</div></div>
+      <div class="sum-item si-red" style="border-radius:9px;padding:12px;margin-bottom:8px"><div class="si-lbl">⚠️ Jumlah Siswa Menunggak</div><div class="si-val">${tgk.length}</div></div>
+    </div>
+  </div>`;
+}
+function sppGoP(p){S.sppPage=p;renderPage('akuntan_spp')}
+
+/* ══════════════════════════════════════════
+   PAGE: CATAT PEMBAYARAN
+══════════════════════════════════════════ */
+function pgCatat(){
+  const td=todayStr();
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const now=new Date();let periodeOpts='';
+  for(let i=0;i<6;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);periodeOpts+=`<option value="${months[d.getMonth()]} ${d.getFullYear()}">${months[d.getMonth()]} ${d.getFullYear()}</option>`}
+  return`
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:11px">🔍 Cari Siswa</div>
+    <div style="display:flex;gap:10px">
+      <div class="ac-wrap" style="flex:1">
+        <input class="fc" id="cSrch" placeholder="Ketik ID siswa atau nama..." oninput="stuAC(this.value,'cStuAC','cSrch','_x')">
+        <div id="cStuAC" class="ac-dd hidden"></div>
+      </div>
+      <button class="btn btn-p" onclick="stuAC(document.getElementById('cSrch').value,'cStuAC','cSrch','_x')">🔍 Cari</button>
+    </div>
+    <div id="cStuInfo" style="margin-top:8px;font-size:13px;color:#888">${S.catStu?`<div style="background:#e8f5e9;padding:8px 12px;border-radius:6px;font-weight:600;color:#2E7D32">✅ ${S.catStu.namaLengkap} | ${S.catStu.tingkatKelas} | ${S.catStu.status}</div>`:'Belum ada siswa dipilih'}</div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="cf-grid">
+      <div>
+        <div class="fg"><label class="fl">Tanggal Bayar</label><input type="date" class="fc" id="cTgl" value="${td}" oninput="updPrev()"></div>
+        <div class="fg">
+          <label class="fl">Periode</label>
+          <select class="fc" id="cPer" onchange="updPrev()"><option value="">---- Pilih Periode ----</option>${periodeOpts}</select>
+          <div id="eP" class="ferrtxt hidden">*Periode belum dipilih</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Metode Pembayaran</label>
+          <select class="fc" id="cMet" onchange="updPrev()"><option value="">---- Pilih Metode ----</option><option>Tunai</option><option>Transfer Bank</option><option>QRIS</option></select>
+          <div id="eM" class="ferrtxt hidden">*Metode belum dipilih</div>
+        </div>
+      </div>
+      <div>
+        <div class="fg">
+          <label class="fl">Kategori SPP</label>
+          <select class="fc" id="cKat" onchange="autoNom();updPrev()"><option value="">---- Pilih Kategori ----</option><option value="Reguler-Bulanan">Reguler-Bulanan</option><option value="Intensif-Bulanan">Intensif-Bulanan</option><option value="Reguler-Per Pertemuan">Reguler-Per Pertemuan</option></select>
+          <div id="eK" class="ferrtxt hidden">*Kategori belum dipilih</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Nominal SPP</label>
+          <input type="number" class="fc" id="cNom" value="160000" oninput="updPrev()" placeholder="0">
+          <div id="eN" class="ferrtxt hidden">*Nominal tidak valid</div>
+        </div>
+        <div class="fg">
+          <label class="fl">Status Bayar</label>
+          <div class="st-tog">
+            <button class="stb stb-l${S.selStat==='Lunas'?' sel':''}" id="btnL" onclick="setStat('Lunas')">Lunas</button>
+            <button class="stb stb-t${S.selStat==='Tunggakan'?' sel':''}" id="btnT" onclick="setStat('Tunggakan')">Tunggakan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Keterangan (Opsional)</label><input class="fc" id="cKet" placeholder="Catatan tambahan jika ada........."></div>
+  </div>
+  <div class="prv-tr">
+    <div class="pt-title" style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:11px">👁 Pratinjau Transaksi</div>
+    <div class="prv-row">
+      <div class="prv-col" style="flex:1"><div class="pc-l">ID Transaksi</div><div class="pc-v" id="pvId">${genTrxId()}</div></div>
+      <div class="prv-col" style="flex:1"><div class="pc-l">Siswa</div><div class="pc-v" id="pvStu">${S.catStu?S.catStu.namaLengkap:'-'}</div></div>
+      <div class="prv-col" style="flex:1"><div class="pc-l">Nominal</div><div class="pc-v" id="pvNom">-</div></div>
+    </div>
+    <div class="prv-row" style="margin-top:8px">
+      <div class="prv-col" style="flex:1"><div class="pc-l">Tanggal Bayar</div><div class="pc-v" id="pvTgl">-</div></div>
+      <div class="prv-col" style="flex:1"><div class="pc-l">Kategori & Periode</div><div class="pc-v" id="pvKat">-</div></div>
+      <div class="prv-col" style="flex:1"><div class="pc-l">Metode & Status</div><div class="pc-v" id="pvMet">-</div></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:11px;justify-content:flex-end">
+    <button class="btn btn-s" onclick="resetCatat()">Batal/Reset</button>
+    <button class="btn btn-p" style="padding:11px 28px" onclick="submitCatat()">Simpan</button>
+  </div>`;
+}
+// override stuAC for catat page to select into S.catStu
+const _origSelStu=selStu;
+function selStu(id,inId,nameId,acId){
+  const s=gStu(id);if(!s)return;
+  const inEl=document.getElementById(inId);if(inEl)inEl.value=`${s.namaLengkap} (${s.id})`;
+  const nmEl=document.getElementById(nameId);if(nmEl)nmEl.value=s.namaLengkap;
+  document.getElementById(acId)?.classList.add('hidden');
+  // if catat page
+  if(inId==='cSrch'){
+    S.catStu=s;
+    const info=document.getElementById('cStuInfo');
+    if(info)info.innerHTML=`<div style="background:#e8f5e9;padding:8px 12px;border-radius:6px;font-weight:600;color:#2E7D32">✅ ${s.namaLengkap} | ${s.tingkatKelas} | ${s.status}</div>`;
+    document.getElementById('pvStu').textContent=s.namaLengkap;
+    updPrev();
+  }else{
+    const k=s.tingkatKelas?.toLowerCase()||'';
+    const pg=document.getElementById('pProg');
+    if(pg){if(k.includes('tk'))pg.value='TK';else if(k.includes('sd')||k.includes('calis'))pg.value='SD';else if(k.includes('smp'))pg.value='SMP';else if(k.includes('sma'))pg.value='SMA';}
+    updatePltJdw();
+  }
+}
+function setStat(st){
+  S.selStat=st;
+  document.getElementById('btnL')?.classList.toggle('sel',st==='Lunas');
+  document.getElementById('btnT')?.classList.toggle('sel',st==='Tunggakan');
+  updPrev();
+}
+function autoNom(){const m={'Reguler-Bulanan':160000,'Intensif-Bulanan':250000,'Reguler-Per Pertemuan':50000};const k=document.getElementById('cKat')?.value;if(k&&m[k])document.getElementById('cNom').value=m[k]}
+function updPrev(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  const nom=document.getElementById('cNom')?.value||0;
+  const tgl=document.getElementById('cTgl')?.value||'';
+  const per=document.getElementById('cPer')?.value||'-';
+  const kat=document.getElementById('cKat')?.value||'-';
+  const met=document.getElementById('cMet')?.value||'-';
+  set('pvNom',nom>0?rp(nom):'-');
+  set('pvTgl',tgl?fmtDate(tgl):'-');
+  set('pvKat',`${kat} - ${per}`);
+  set('pvMet',`${met} - ${S.selStat}`);
+}
+function resetCatat(){S.catStu=null;S.selStat='Lunas';renderPage('akuntan_catat')}
+function submitCatat(){
+  const per=document.getElementById('cPer')?.value;
+  const kat=document.getElementById('cKat')?.value;
+  const met=document.getElementById('cMet')?.value;
+  const nom=document.getElementById('cNom')?.value;
+  let ok=true;
+  if(!S.catStu){toast('Pilih siswa terlebih dahulu!',false);return}
+  const sh=(id,show)=>document.getElementById(id)?.classList[show?'remove':'add']('hidden');
+  sh('eP',!per);if(!per)ok=false;
+  sh('eK',!kat);if(!kat)ok=false;
+  sh('eM',!met);if(!met)ok=false;
+  sh('eN',!nom||nom<=0);if(!nom||nom<=0)ok=false;
+  if(!ok)return;
+  const nid=genTrxId();const tgl=document.getElementById('cTgl')?.value;const ket=document.getElementById('cKet')?.value||'';
+  openMod(`<div class="mgreen" onclick="event.stopPropagation()">
+    <div class="m-ico">❓</div>
+    <div class="m-ttl">Apakah Anda Yakin?</div>
+    <div class="m-sub">Data transaksi berikut akan disimpan ke database</div>
+    <div class="m-row"><span class="m-k">Siswa</span><span class="m-v">${S.catStu.namaLengkap} (${S.catStu.id})</span></div>
+    <div class="m-row"><span class="m-k">Nominal</span><span class="m-v">${rp(nom)}</span></div>
+    <div class="m-row"><span class="m-k">Kategori</span><span class="m-v">${kat} – ${per}</span></div>
+    <div class="m-row"><span class="m-k">Metode</span><span class="m-v">${met}</span></div>
+    <div class="m-row"><span class="m-k">Status</span><span class="m-v">${S.selStat}</span></div>
+    <div class="m-acts">
+      <button class="btn" style="background:rgba(255,255,255,.2);color:#fff" onclick="closeMod()">Kembali</button>
+      <button class="btn" style="background:rgba(255,255,255,.25);color:#fff;font-weight:700" onclick="doSaveSPP('${nid}','${tgl}','${per}','${kat}','${met}',${nom},'${ket.replace(/'/g,"\\'")}')">Ya, Simpan</button>
+    </div>
+  </div>`);
+}
+function doSaveSPP(nid,tgl,per,kat,met,nom,ket){
+  db.trx.push({id:nid,idSiswa:S.catStu.id,tglBayar:tgl,nominal:Number(nom),metodeBayar:met,kategoriSPP:kat,periode:per,statusSPP:S.selStat,keterangan:ket});
+  save();closeMod();
+  openMod(`<div class="mgreen" onclick="event.stopPropagation()" style="text-align:center">
+    <div style="font-size:56px;margin-bottom:14px">✅</div>
+    <div class="m-ttl" style="font-size:22px">Data Berhasil Disimpan</div>
+    <div class="m-acts">
+      <button class="btn" style="background:rgba(255,255,255,.2);color:#fff" onclick="closeMod();go('akuntan_spp')">Lihat Database SPP</button>
+      <button class="btn" style="background:rgba(255,255,255,.25);color:#fff;font-weight:700" onclick="closeMod();resetCatat()">Catat Lagi</button>
+    </div>
+  </div>`);
+}
+
+/* ══════════════════════════════════════════
+   PAGE: LAPORAN KEUANGAN (AKUNTAN)
+══════════════════════════════════════════ */
+function pgLaporan(){
+  const lunas=db.trx.filter(t=>t.statusSPP==='Lunas');
+  const blm=db.trx.filter(t=>t.statusSPP!=='Lunas');
+  const tot=lunas.reduce((s,t)=>s+Number(t.nominal),0);
+  const totBlm=blm.reduce((s,t)=>s+Number(t.nominal),0);
+  return`
+  <div class="pa-bar"><div class="db-title">LAPORAN KEUANGAN</div>
+    <button class="abt abt-p" onclick="toast('Export xlsx berhasil!')">⬇️ Export XLSX</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:20px">
+    <div class="card sum-item si-blue"><div class="si-lbl" style="font-size:13px">💰 Total Pemasukan</div><div class="si-val" style="font-size:24px">${rp(tot)}</div></div>
+    <div class="card sum-item si-red"><div class="si-lbl" style="font-size:13px">⚠️ Total Belum Masuk</div><div class="si-val" style="font-size:24px">${rp(totBlm)}</div></div>
+    <div class="card"><div style="font-size:13px;font-weight:700">📊 Total Transaksi</div><div style="font-size:32px;font-weight:800;margin-top:6px">${db.trx.length}</div></div>
+  </div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px">Riwayat Transaksi Lengkap</div>
+    <div class="tbl-box"><table class="dtbl"><thead><tr><th>ID</th><th>ID Siswa</th><th>Nama</th><th>Periode</th><th>Nominal</th><th>Metode</th><th>Status</th></tr></thead><tbody>
+      ${db.trx.map(t=>{const s=gStu(t.idSiswa);return`<tr><td>${t.id}</td><td class="idlnk" onclick="showStuDet('${t.idSiswa}')">${t.idSiswa}</td><td>${s?.namaLengkap||'-'}</td><td>${t.periode||'-'}</td><td>${rp(t.nominal)}</td><td>${t.metodeBayar||'-'}</td><td>${badgeSPP(t.statusSPP)}</td></tr>`}).join('')}
+    </tbody></table></div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: MASTER SISWA READONLY (AKUNTAN)
+══════════════════════════════════════════ */
+function pgMasterRO(){
+  let data=db.students;
+  if(S.msSearch)data=data.filter(s=>s.id.toLowerCase().includes(S.msSearch.toLowerCase())||s.namaLengkap.toLowerCase().includes(S.msSearch.toLowerCase()));
+  const pg=paginate(data,S.msPage);
+  return`
+  <div class="pa-bar"><div class="db-title">DATA SISWA</div><span style="font-size:12px;color:#888;padding:7px 13px;background:#fff;border-radius:7px;border:1px solid #ddd">👁 Mode Baca Saja</span></div>
+  <div class="db-sub">Biodata dan kontak siswa – hanya dapat dilihat oleh Akuntan</div>
+  <div class="fbar">
+    <input class="fc" style="max-width:280px" placeholder="Cari ID atau nama siswa..." id="roSrch" value="${S.msSearch}" onkeydown="if(event.key==='Enter'){S.msSearch=this.value;S.msPage=1;renderPage('akuntan_master_ro')}">
+    <button class="fbtn" onclick="S.msSearch=document.getElementById('roSrch').value;S.msPage=1;renderPage('akuntan_master_ro')">Cari</button>
+    ${S.msSearch?`<button class="fbtn" onclick="S.msSearch='';S.msPage=1;renderPage('akuntan_master_ro')">Reset</button>`:''}
+  </div>
+  <div class="tbl-box"><table class="dtbl"><thead><tr><th>ID Siswa</th><th>Nama Lengkap</th><th>Tingkat Kelas</th><th>No HP Ortu</th><th>No HP Siswa</th><th>Tgl Mendaftar</th><th>Status</th></tr></thead><tbody>
+    ${pg.map(s=>`<tr><td class="idlnk" onclick="showStuDet('${s.id}')">${s.id}</td><td style="text-align:left">${s.namaLengkap}</td><td>${s.tingkatKelas}</td><td>${s.noHpOrtu}</td><td>${s.noHpSiswa}</td><td>${s.tglMendaftar}</td><td>${badgeStu(s.status)}</td></tr>`).join('')||'<tr><td colspan="7" style="color:#999">Tidak ada data</td></tr>'}
+  </tbody></table></div>
+  <div class="tbl-foot"><span style="font-size:12px;color:#888">${data.length} siswa</span>${pgHTML(data.length,S.msPage,5,'roGoP')}</div>`;
+}
+function roGoP(p){S.msPage=p;renderPage('akuntan_master_ro')}
+
+/* ══════════════════════════════════════════
+   PAGE: OWNER LAPORAN
+══════════════════════════════════════════ */
+function pgOwnerLaporan(){
+  const aktif=db.students.filter(s=>s.status==='Aktif').length;
+  const klr=db.students.filter(s=>['Keluar','Non-Aktif'].includes(s.status)).length;
+  const lunas=db.trx.filter(t=>t.statusSPP==='Lunas');
+  const blm=db.trx.filter(t=>t.statusSPP!=='Lunas');
+  const tot=lunas.reduce((s,t)=>s+Number(t.nominal),0);
+  const totB=blm.reduce((s,t)=>s+Number(t.nominal),0);
+  return`
+  <div class="pa-bar" style="margin-bottom:18px">
+    <div class="db-title">LAPORAN</div>
+    <button class="abt abt-p" onclick="toast('Export xlsx berhasil!')">⬇️ Export xlsx.</button>
+  </div>
+  <div class="lap-stats">
+    <div class="ls-card"><div class="ls-lbl">Total siswa aktif</div><div class="ls-val ls-g">${aktif}</div><div class="ls-sub">Meningkat dari bulan sebelumnya</div></div>
+    <div class="ls-card"><div class="ls-lbl">Total siswa keluar</div><div class="ls-val ls-r">${klr}</div><div class="ls-sub">Menurun dari bulan sebelumnya</div></div>
+    <div class="ls-card"><div class="ls-lbl">Total pembayaran SPP</div><div class="ls-val ls-b">${(tot/1000000).toFixed(1)} jt</div><div class="ls-sub">Meningkat sebesar 15% dari bulan sebelumnya</div></div>
+    <div class="ls-card"><div class="ls-lbl">Total SPP yang belum dibayar</div><div class="ls-val ls-o">${(totB/1000000).toFixed(1)} jt</div><div class="ls-sub">Meningkat sebesar 4% dari bulan sebelumnya</div></div>
+  </div>
+  <div class="charts-row">
+    <div class="ch-card"><div class="ch-ttl">Jumlah Pendaftar – 6 bulan terakhir</div><canvas id="chPend" height="200"></canvas></div>
+    <div class="ch-card"><div class="ch-ttl">Pemasukan SPP – 6 bulan terakhir</div><canvas id="chSPP" height="200"></canvas></div>
+  </div>`;
+}
+function initCharts(){
+  const tot=db.trx.filter(t=>t.statusSPP==='Lunas').reduce((s,t)=>s+t.nominal,0);
+  const cp=document.getElementById('chPend');
+  if(cp){const c=new Chart(cp,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','Mei','Jun'],datasets:[{label:'Pendaftar',data:[30,38,40,45,46,db.students.length],backgroundColor:'#FFD600',borderRadius:5}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{y:{beginAtZero:true}}}});_charts.push(c)}
+  const cs=document.getElementById('chSPP');
+  if(cs){const c=new Chart(cs,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','Mei','Jun'],datasets:[{label:'Pemasukan (jt)',data:[12,18.5,12,25,30,+(tot/1000000).toFixed(1)],borderColor:'#2E7D32',backgroundColor:'rgba(46,125,50,.1)',tension:.4,fill:true,pointBackgroundColor:'#2E7D32',pointRadius:5}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{y:{beginAtZero:true}}}});_charts.push(c)}
+}
+
+/* ══════════════════════════════════════════
+   PAGE: PENGATURAN
+══════════════════════════════════════════ */
+function pgPengaturan(){
+  const u=S.user;const av={admin:'👤',akuntan:'🖨',owner:'👨'}[u.role];
+  return`<div class="stg-card">
+    <h2 style="color:#1a237e;font-size:17px;font-weight:700">Pengaturan Akun</h2>
+    <div class="stg-inner">
+      <div class="stg-av">${av}</div>
+      <div class="stg-flds">
+        <div class="stg-fld">${u.username}</div>
+        <div class="stg-fld">${u.email}</div>
+        <div class="stg-fld">${u.title}</div>
+      </div>
+      <div class="stg-sta">AKTIF</div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: KELUAR
+══════════════════════════════════════════ */
+function pgKeluar(){
+  const prev=S.prevPage||{admin:'admin_dashboard',akuntan:'akuntan_dashboard',owner:'owner_laporan'}[S.user?.role]||'admin_dashboard';
+  return`<div class="kel-wrap">
+    <div class="kel-ttl">Apakah Anda Ingin Keluar?</div>
+    <div class="kel-btns">
+      <button class="kel-ya" onclick="doLogout()">YA</button>
+      <button class="kel-tdk" onclick="go('${prev}')">TIDAK</button>
+    </div>
+  </div>`;
+}
+function doLogout(){
+  S={user:null,page:null,prevPage:null,msView:'siswa',msPage:1,msSearch:'',sppFilt:'semua',sppPage:1,pltCabang:'semua',pltProg:'semua',selStat:'Lunas',catStu:null};
+  parsed={};_charts.forEach(c=>{try{c.destroy()}catch(e){}});_charts=[];
+  document.getElementById('appLayout').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('lUser').value='';document.getElementById('lPass').value='';document.getElementById('lErr').innerHTML='';
+}
+
+/* ══════════════════════════════════════════
+   GLOBAL EVENT LISTENERS
+══════════════════════════════════════════ */
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.ac-wrap'))document.querySelectorAll('.ac-dd').forEach(d=>d.classList.add('hidden'));
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')document.getElementById('mOv').classList.add('hidden');
+});
+</script>
+</body>
+</html>
